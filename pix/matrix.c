@@ -21,19 +21,21 @@ void vadd_s(int vlen, int op, short *v1, short *v2, short *r)
     int  i;
 
     if (op == 1) {
-#pragma omp parallel for private(i)
-	for (i=0; i < vlen; i++)
-	    r[i] = (short)(v1[i] + v2[i]);
+        //#pragma acc parallel loop create(r[:vlen]) copyin(v1[:vlen], v2[:vlen])
+        for (i=0; i < vlen; i++) {
+            r[i] = (short)(v1[i] + v2[i]);
+        }
     }
     else if (op == 0) {
-#pragma omp parallel for private(i)
+    //#pragma omp parallel for private(i)
 	for (i=0; i < vlen; i++)
 	    r[i] = (short)((v1[i] > v2[i]) ? (v1[i] - v2[i]) : 0);
     }
     else {
-#pragma omp parallel for private(i)
-	for (i=0; i < vlen; i++)
-	    r[i] = (short)(v1[i] - v2[i]);
+        //#pragma acc parallel loop create(r[:vlen]) copyin(v1[:vlen], v2[:vlen])
+        for (i=0; i < vlen; i++) {
+            r[i] = (short)(v1[i] - v2[i]);
+        }
     }
 }
 
@@ -86,6 +88,7 @@ void mx_sub_s(int dim_x, int dim_y, int *sdim, short *mx, short *mr)
 {
     int    x1, x2, y1, y2, sdim_x;
     int    i, j, xx, yy;
+    int    mr_max, mx_max;
 
     x1 = sdim[0];
     x2 = sdim[1];
@@ -93,13 +96,18 @@ void mx_sub_s(int dim_x, int dim_y, int *sdim, short *mx, short *mr)
     y2 = sdim[3];
     sdim_x = x2-x1+1;
 
-#pragma omp parallel for private(i,j,xx,yy)
+    mr_max = (x2-x1) + (y2-y1)*sdim_x + 1;
+    mx_max = x2 + y2*dim_x;
+
+    //#pragma acc parallel loop copyin(mr[:mr_max], mx[:mx_max]) copyout(mr[:mr_max]) collase(2)
+    //#pragma omp parallel for private(i,j,xx,yy)
     for (j=y1; j <= y2; j++) {
-    for (i=x1; i <= x2; i++) {
-	yy = (i-x1) + (j-y1)*sdim_x;
-	xx = i + j*dim_x;
-	mr[yy] = mx[xx];
-    }}
+        for (i=x1; i <= x2; i++) {
+            yy = (i-x1) + (j-y1)*sdim_x;
+            xx = i + j*dim_x;
+            mr[yy] = mx[xx];
+        }
+    }
 }
 
 // void mx_subT_s(int dim_x, int dim_y, int *sdim, short *mx, short *mr)
@@ -136,7 +144,7 @@ void mx_rsub_s(int dim_x, int dim_y, int *sdim, short *mx, short *mr)
     y1 = sdim[2];
     y2 = sdim[3];
 
-#pragma omp parallel for private(i,j,xx)
+//#pragma omp parallel for private(i,j,xx)
     for (j=y1; j <= y2; j++) {
     for (i=x1; i <= x2; i++) {
 	xx = i + j*dim_x;

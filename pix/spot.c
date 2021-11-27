@@ -129,7 +129,8 @@ void spot_fitting(para_t *p) {
 //  Fitting for the normal spots.
     sp = p->sp1;
     n  = 0;
-#pragma omp parallel for private(i,r) reduction(+:n)
+//#pragma omp parallel for private(i,r) reduction(+:n)
+    //#pragma omp parallel for private(i,r) reduction(+:n) 
     for (i=0; i < p->n_sp1; i++) {
         r = SpotFit(p, x_fit, y_fit, sp[i]);
         if (r == 0) n++;
@@ -144,7 +145,8 @@ void spot_fitting(para_t *p) {
 //  Fitting for the high-intensity spots.
     sp = p->sp2;
     n  = 0;
-#pragma omp parallel for private(i,r) reduction(+:n)
+//#pragma omp parallel for private(i,r) reduction(+:n)
+    //#pragma omp parallel for private(i,r) reduction(+:n)
     for (i=0; i < p->n_sp2; i++) {
         r = SpotFit(p, x_fit, y_fit, sp[i]);
         if (r == 0) n++;

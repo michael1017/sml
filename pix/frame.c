@@ -129,7 +129,8 @@ static void push_spot(para_t *p, int mode, int fID, int x, int y, short *simg) {
 
 // Summing the spot pixels for this frame.
     sp[i]->cnt++;
-#pragma omp parallel for private(j)
+//#pragma omp parallel for private(j)
+    
     for (j=0; j < imglen; j++)
         sp[i]->img[j] += (int)(simg[j]);
 
@@ -298,7 +299,7 @@ static int check_mark(int x0, int y0, int wx, int wy, int dim_x, int dim_y,
         }
     }
 
-#pragma omp parallel for private(x,y,xx)
+//#pragma omp parallel for private(x,y,xx)
     for (y=y0-wy; y <= y0+wy; y++) {
         for (x=x0-wx; x <= x0+wx; x++) {
             xx = x + y*dim_x;

@@ -1,6 +1,6 @@
 ARCH   := LINUX
 CC     := gcc
-CFLAGS := -O2 -Wall
+CFLAGS := -L /usr/lib64 -O2 -Wall -lGL
 
 ifeq ($(ARCH),APPLE)
     OPENGL_LIB := -framework GLUT -framework OpenGL
